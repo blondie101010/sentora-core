@@ -1,26 +1,32 @@
-# Sentora
+# Sentora-ng
 
-* Version: 1.0.3
-* [Website](http://sentora.org/)
-* [Forums](http://forums.sentora.org/) for comments, discussion and community support.
-* [Bug Tracker](https://github.com/sentora/sentora-core/issues) for any bugs or security related issues.
+* Version: pre-0.1
+
+
+* [Website](http://noSiteYet/)
+* Please use GitHub's issue tracker for any bugs, security related issues, or suggestions.
 
 ## Description
 
-[Sentora](http://sentora.org) is based on an original fork of ZPanelCP, Sentora is an open-source web hosting control panel written in PHP and is designed to work with with Linux, UNIX and the BSD's.
+Sentora-ng is based on Sentora which originates from an original fork of ZPanelCP. Sentora-ng is an open-source web hosting control panel written in PHP and is designed to work with with Linux, UNIX and the BSD's.
 
-Sentora is developed and maintained by the original ZPanel team members ([ballen](http://bobbyallen.me), tgates, kandrews, motters etc.)
+The main purpose of this fork is to allow a backwards incompatible jump in the future with the following features:
 
-## Downloading Sentora
+- native multi PHP version support with PHP-FPM
+- native LetsEncrypt wildcard domain support
+- native Apache 2.4 support (without tweeking)
+- PHP 7 compatible code
+- integrated installer that supports the new options
+- create a new zppy repo for xbilling (since the original is now offline)
 
-To use Sentora in a production environment we recommend you use our automated installers which also take care of the installation of not only Sentora but also Apache, PHP, MySQL, BIND, ProFTPd etc.
+## Installing Sentora-ng
 
-To download Sentora please use the links found on [our download page](http://sentora.org/download/).
+**coming soon**
 
 ## License agreement
 
-Sentora is licensed under the [GNU GENERAL PUBLIC LICENSE (GPL v3)](LICENSE.md) a copy of this license is provided.
+Sentora-ng is licensed under the [GNU GENERAL PUBLIC LICENSE (GPL v3)](LICENSE.md) a copy of this license is provided.
 
 ## Getting support
 
-We provide excellent free (and premium) [support](http://sentora.org/support/) and [documentation](http://docs.sentora.org/?node=23) at our website.
+Support options will be offered once the product is released.
