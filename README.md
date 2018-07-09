@@ -15,9 +15,10 @@ The main purpose of this fork is to allow a backwards incompatible jump in the f
 - native multi PHP version support with PHP-FPM
 - native LetsEncrypt wildcard domain support
 - native Apache 2.4 support (without tweeking)
-- PHP 7 compatible code
 - integrated installer that supports the new options
 - create a new zppy repo for xbilling (since the original is now offline)
+- PHP 7 compatible code (phase 2)
+- Suhosin replacement to allow PHP 7 compatibility, and improved security context (phase 2)
 
 ## Installing Sentora-ng
 
