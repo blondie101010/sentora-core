@@ -148,6 +148,7 @@ function WriteDNSNamedHook()
             $line .= "zone \"" . $domain . "\" IN {" . fs_filehandler::NewLine();
             $line .= "	type master;" . fs_filehandler::NewLine();
             $line .= "	file \"" . ctrl_options::GetSystemOption('zone_dir') . $domain . ".txt\";" . fs_filehandler::NewLine();
+	    $line .= "  update-policy { grant rndc-key name _acme-challenge.$domain txt; };" . fs_filehandler::NewLine();
             $line .= "	allow-transfer { " . ctrl_options::GetSystemOption('allow_xfer') . "; };" . fs_filehandler::NewLine();
             $line .= "};" . fs_filehandler::NewLine();
         } else {
