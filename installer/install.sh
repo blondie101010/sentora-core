@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# Official Sentora Automated Installation Script
+# Fork of the Official Sentora Automated Installation Script at 
+# https://github.com/sentora/sentora-installers/blob/master/sentora_install.sh
 # =============================================
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -27,6 +28,7 @@
 #   Pascal Peyremorte (ppeyremorte@sentora.org)
 #   Mehdi Blagui 
 #   Kevin Andrews (kevin@zvps.uk)
+#   Julie Pelletier (blondie101010)
 #
 #   and all those who participated to this and to previous installers.
 #   Thanks to all.
@@ -1195,7 +1197,7 @@ sed -i "s|!SERVER_IP!|$PUBLIC_IP|" $PANEL_CONF/bind/named.conf
 
 # Build key and conf files
 rm -rf $BIND_FILES/named.conf $BIND_FILES/rndc.conf $BIND_FILES/rndc.key
-rndc-confgen -a -r /dev/urandom
+rndc-confgen -a -r /dev/urandom -A hmac-sha512
 cat $BIND_FILES/rndc.key $PANEL_CONF/bind/named.conf > $BIND_FILES/named.conf
 cat $BIND_FILES/rndc.key $PANEL_CONF/bind/rndc.conf > $BIND_FILES/rndc.conf
 rm -f $BIND_FILES/rndc.key
