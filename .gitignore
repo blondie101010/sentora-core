@@ -3,6 +3,7 @@
 /.vagrant
 .DS_Store
 Thumbs.db
+.*.swp
 
 # Ignore non-core styles, modules and apps.
 
