@@ -326,7 +326,7 @@ class fs_director {
      * @param string $filename The full path to the file.
      * @return string The file name.
      */
-    static function GetFileNameNoExtentsion($filename) {
+    static function GetFileNameNoExtension($filename) {
         return pathinfo($filename, PATHINFO_FILENAME);
     }
 
