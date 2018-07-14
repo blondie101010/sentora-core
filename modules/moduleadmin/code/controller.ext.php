@@ -365,43 +365,83 @@ class module_controller extends ctrl_module
         return $retval;
     }
 
-    static function doInstallModule()
-    {
+    static function doInstallModule() {
         self::$error_message = "";
         self::$error = false;
-        if ($_FILES['modulefile']['error'] > 0) {
-            self::$error_message = "Couldn't upload the file, " . $_FILES['modulefile']['error'] . "";
-        } else {
-            $archive_ext = fs_director::GetFileExtension($_FILES['modulefile']['name']);
-            $module_folder = fs_director::GetFileNameNoExtentsion($_FILES['modulefile']['name']);
-            $module_dir = ctrl_options::GetSystemOption('sentora_root') . 'modules/' . $module_folder;
-            if (!fs_director::CheckFolderExists($module_dir)) {
-                if ($archive_ext != 'zpp') {
-                    self::$error_message = "Package type was not detected as a .zpp (Sentora Package) archive.";
-                } else {
-                    if (fs_director::CreateDirectory($module_dir)) {
-                        if (sys_archive::Unzip($_FILES['modulefile']['tmp_name'], $module_dir . '/')) {
-                            if (!fs_director::CheckFileExists($module_dir . '/module.xml')) {
-                                self::$error_message = "No module.xml file found in the unzipped archive.";
-                            } else {
-                                ui_module::ModuleInfoToDB($module_folder);
-                                $extra_config = $module_dir . "/deploy/install.run";
-                                if (fs_director::CheckFileExists($extra_config))
-                                    exec(ctrl_options::GetSystemOption('php_exer') . " " . $extra_config . "");
-                                self::$ok = true;
-                            }
-                        } else {
-                            self::$error_message = "Couldn't unzip the archive (" . $_FILES['modulefile']['tmp_name'] . ") to " . $module_dir . '/';
-                        }
-                    } else {
-                        self::$error_message = "Couldn't create module folder in " . $module_dir;
-                    }
-                }
-            } else {
-                self::$error_message = "The module " . $module_folder . " is already installed on this server!";
-            }
-        }
-        return;
-    }
+		switch($_POST["moduleSource"]) {
+			case 'file':
+        		if ($_FILES['modulefile']['error'] > 0) {
+            		self::$error_message = "Couldn't upload the file, " . $_FILES['modulefile']['error'] . "";
+	    			return;
+        		}
 
+            	$archive_ext = fs_director::GetFileExtension($_FILES['modulefile']['name']);
+				$module_folder = fs_director::GetFileNameNoExtension($_FILES['modulefile']['name']);
+				$module_dir = ctrl_options::GetSystemOption('sentora_root') . 'modules/' . $module_folder;
+
+				if (fs_director::CheckFolderExists($module_dir)) {
+                	self::$error_message = "The module " . $module_folder . " is already installed on this server!";
+	    			return;
+				}
+
+				if ($archive_ext != 'zpp') {
+                   	self::$error_message = "Package type was not detected as a .zpp (Sentora Package) archive.";
+	    			return;
+               	}
+
+				if (!fs_director::CreateDirectory($module_dir)) {
+					self::$error_message = "Couldn't create module folder in " . $module_dir;
+	    			return;
+				}
+
+				if (!sys_archive::Unzip($_FILES['modulefile']['tmp_name'], $module_dir . '/')) {
+					self::$error_message = "Couldn't unzip the archive (" . $_FILES['modulefile']['tmp_name'] . ") to " . $module_dir . '/';
+	    			return;
+				}
+				break;
+
+			case 'git':
+				if (empty($_POST["moduleurl"]) {
+					self::$error_message = "The git module URL was not provided.";
+	    			return;
+				}
+
+				$url = $_POST["moduleurl"];
+
+				$module_folder = fs_director::GetFileNameNoExtension($url);
+				$module_dir = ctrl_options::GetSystemOption('sentora_root') . 'modules/' . $module_folder;
+
+				if (fs_director::CheckFolderExists($module_dir)) {
+                	self::$error_message = "The module " . $module_folder . " is already installed on this server!";
+	    			return;
+				}
+
+				// run git to retrieve the module
+				chdir(ctrl_options::GetSystemOption('sentora_root') . 'modules/');
+				exec("git clone " . escapeshellarg($url), $output = [], $ret);
+
+				if ($ret != 0) {
+                   	self::$error_message = "Git clone $url failed.";
+	    			return;
+				}
+				break;
+
+			default:
+				self::$error_message = "Invalid option selected: {$_POST["moduleSource"]}.";
+				return;
+		}
+
+		if (!fs_director::CheckFileExists($module_dir . '/module.xml')) {
+			self::$error_message = "No module.xml file found in the unzipped archive.";
+   			return;
+		}
+
+		ui_module::ModuleInfoToDB($module_folder);
+		$extra_config = $module_dir . "/deploy/install.run";
+
+		if (fs_director::CheckFileExists($extra_config)) {
+			exec(ctrl_options::GetSystemOption('php_exer') . " " . $extra_config . "");
+			self::$ok = true;
+		}
+    }
 }
