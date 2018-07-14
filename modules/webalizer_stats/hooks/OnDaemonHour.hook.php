@@ -8,21 +8,21 @@
  *
  * changes P;Peyremorte : reduced duplicate strings constructions
  */
-echo fs_filehandler::NewLine() . "BEGIN Webalizer Stats" . fs_filehandler::NewLine();
+echo PHP_EOL . "BEGIN Webalizer Stats" . PHP_EOL;
 if ( ui_module::CheckModuleEnabled( 'Webalizer Stats' ) ) {
     GenerateWebalizerStats();
 }
 else {
-    echo "Webalizer Stats Module DISABLED." . fs_filehandler::NewLine();
+    echo "Webalizer Stats Module DISABLED." . PHP_EOL;
 }
-echo "END Webalizer Stats" . fs_filehandler::NewLine();
+echo "END Webalizer Stats" . PHP_EOL;
 
 function GenerateWebalizerStats()
 {
     global $zdbh;
     $sql      = $zdbh->prepare( "SELECT * FROM x_vhosts LEFT JOIN x_accounts ON x_vhosts.vh_acc_fk=x_accounts.ac_id_pk WHERE vh_deleted_ts IS NULL" );
     $sql->execute();
-    echo "Generating webalizer stats html..." . fs_filehandler::NewLine();
+    echo "Generating webalizer stats html..." . PHP_EOL;
     while ( $rowvhost = $sql->fetch() ) {
       $basedir = ctrl_options::GetSystemOption( 'sentora_root' ) . "modules/webalizer_stats/stats/" . $rowvhost[ 'ac_user_vc' ] . "/" . $rowvhost[ 'vh_name_vc' ];
       if ( !file_exists( $basedir ) ) {
@@ -68,9 +68,9 @@ function GenerateWebalizerStats()
             $domain,
         );
 
-        echo "Generating stats for: " . $rowvhost[ 'ac_user_vc' ] . "/" . $rowvhost[ 'vh_name_vc' ] . fs_filehandler::NewLine();
+        echo "Generating stats for: " . $rowvhost[ 'ac_user_vc' ] . "/" . $rowvhost[ 'vh_name_vc' ] . PHP_EOL;
         $returnValue = ctrl_system::systemCommand( $command, $args );
-        echo (0 === $returnValue ? 'Succeeded' : 'Failed') . fs_filehandler::NewLine();
+        echo (0 === $returnValue ? 'Succeeded' : 'Failed') . PHP_EOL;
     }
 }
 

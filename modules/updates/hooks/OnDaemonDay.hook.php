@@ -7,10 +7,10 @@
  * This script is handy for caching the latest version of ZPanel to reduce bandwidth from the server.
  * 
  */
-echo fs_filehandler::NewLine() . "START Sentora Updates hook" . fs_filehandler::NewLine();
-echo "Checking for latest version of Sentora..." . fs_filehandler::NewLine();
+echo PHP_EOL . "START Sentora Updates hook" . PHP_EOL;
+echo "Checking for latest version of Sentora..." . PHP_EOL;
 CheckSentoraLatestVersion();
-echo "END Sentora Updates hook" . fs_filehandler::NewLine();
+echo "END Sentora Updates hook" . PHP_EOL;
 function CheckSentoraLatestVersion() {
     // Grab the latest version of Sentora from the Sentora API servers and cache it into the database.
     $live_version = ws_generic::ReadURLRequestResult(ctrl_options::GetSystemOption('update_url'));

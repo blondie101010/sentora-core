@@ -145,19 +145,6 @@ class fs_filehandler {
         }
     }
 
-    /**
-     * Creates the correct line ending based on the server OS platform.
-     * @author Russell Skinner (rskinner@zpanelcp.com)
-     * @return string The correct line ending charater.
-     */
-    static function NewLine() {
-        if (sys_versions::ShowOSPlatformVersion() == "Windows") {
-            $retval = "\r\n";
-        } else {
-            $retval = "\n";
-        }
-        return $retval;
-    }
 
     /**
      * Returns the contents of a file in a string.
@@ -202,9 +189,9 @@ class fs_filehandler {
     static function AddTextToFile($file, $content, $pos) {
         $current_version = @fs_filehandler::ReadFileContents($file);
         if ($pos == 0) {
-            $new_version = $content . fs_filehandler::NewLine() . $current_version;
+            $new_version = $content . PHP_EOL . $current_version;
         } else {
-            $new_version = $current_version . fs_filehandler::NewLine() . $content;
+            $new_version = $current_version . PHP_EOL . $content;
         }
         fs_filehandler::UpdateFile($file, 0777, $new_version);
     }

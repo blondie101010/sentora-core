@@ -3,9 +3,9 @@
 global $zdbh;
 $modsql = $zdbh->prepare("SELECT * FROM x_modules ORDER BY mo_name_vc ASC");
 $modsql->execute();
-echo fs_filehandler::NewLine() . "START checking for any avaliable module updates.." . fs_filehandler::NewLine();
+echo PHP_EOL . "START checking for any avaliable module updates.." . PHP_EOL;
 while ($modules = $modsql->fetch()) {
-    echo "Checking update for mod: " . $modules['mo_name_vc'] . fs_filehandler::NewLine();
+    echo "Checking update for mod: " . $modules['mo_name_vc'] . PHP_EOL;
     $mod_config = new xml_reader(fs_filehandler::ReadFileContents(ctrl_options::GetSystemOption('sentora_root') . 'modules/' . $modules['mo_folder_vc'] . '/module.xml'));
     $mod_config->Parse();
     if (isset($mod_config->document->version[0]->tagData)) {
@@ -30,16 +30,16 @@ while ($modules = $modsql->fetch()) {
                     $versionsql->execute();
                 }
             } else {
-                echo "The remote file was not parsed correctly or does not exist." . fs_filehandler::NewLine();
+                echo "The remote file was not parsed correctly or does not exist." . PHP_EOL;
             }
         } else {
-            echo "The remote file does not exist." . fs_filehandler::NewLine();
+            echo "The remote file does not exist." . PHP_EOL;
         }
     } else {
-        echo "Couldn't open the module XML file for (" . $modules['mo_name_vc'] . ")" . fs_filehandler::NewLine();
+        echo "Couldn't open the module XML file for (" . $modules['mo_name_vc'] . ")" . PHP_EOL;
     }
 }
-echo "END getting module version update information!" . fs_filehandler::NewLine();
+echo "END getting module version update information!" . PHP_EOL;
 
 
 /*

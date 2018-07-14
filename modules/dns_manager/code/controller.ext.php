@@ -1199,38 +1199,38 @@ class module_controller extends ctrl_module
                 $domain = $numrows->fetch();
 
                 $zonecheck_file = (ctrl_options::GetSystemOption('temp_dir')) . $domain['dn_name_vc'] . ".txt";
-                $checkline = "$" . "TTL 10800" . fs_filehandler::NewLine();
+                $checkline = "$" . "TTL 10800" . PHP_EOL;
                 $checkline .= "@ IN SOA " . $domain['dn_name_vc'] . ". ";
-                $checkline .= "postmaster." . $domain['dn_name_vc'] . ". (" . fs_filehandler::NewLine();
-                $checkline .= " " . date("Ymdt") . " ;serial" . fs_filehandler::NewLine();
-                $checkline .= " " . ctrl_options::GetSystemOption('refresh_ttl') . " ;refresh after 6 hours" . fs_filehandler::NewLine();
-                $checkline .= " " . ctrl_options::GetSystemOption('retry_ttl') . " ;retry after 1 hour" . fs_filehandler::NewLine();
-                $checkline .= " " . ctrl_options::GetSystemOption('expire_ttl') . " ;expire after 1 week" . fs_filehandler::NewLine();
-                $checkline .= " " . ctrl_options::GetSystemOption('minimum_ttl') . " ) ;minimum TTL of 1 day" . fs_filehandler::NewLine();
+                $checkline .= "postmaster." . $domain['dn_name_vc'] . ". (" . PHP_EOL;
+                $checkline .= " " . date("Ymdt") . " ;serial" . PHP_EOL;
+                $checkline .= " " . ctrl_options::GetSystemOption('refresh_ttl') . " ;refresh after 6 hours" . PHP_EOL;
+                $checkline .= " " . ctrl_options::GetSystemOption('retry_ttl') . " ;retry after 1 hour" . PHP_EOL;
+                $checkline .= " " . ctrl_options::GetSystemOption('expire_ttl') . " ;expire after 1 week" . PHP_EOL;
+                $checkline .= " " . ctrl_options::GetSystemOption('minimum_ttl') . " ) ;minimum TTL of 1 day" . PHP_EOL;
                 while ($rowdns = $sql->fetch()) {
                     if ($rowdns['dn_type_vc'] == "A") {
-                        $checkline .= $rowdns['dn_host_vc'] . " " . $rowdns['dn_ttl_in'] . " IN A " . $rowdns['dn_target_vc'] . fs_filehandler::NewLine();
+                        $checkline .= $rowdns['dn_host_vc'] . " " . $rowdns['dn_ttl_in'] . " IN A " . $rowdns['dn_target_vc'] . PHP_EOL;
                     }
                     if ($rowdns['dn_type_vc'] == "AAAA") {
-                        $checkline .= $rowdns['dn_host_vc'] . " " . $rowdns['dn_ttl_in'] . " IN AAAA " . $rowdns['dn_target_vc'] . fs_filehandler::NewLine();
+                        $checkline .= $rowdns['dn_host_vc'] . " " . $rowdns['dn_ttl_in'] . " IN AAAA " . $rowdns['dn_target_vc'] . PHP_EOL;
                     }
                     if ($rowdns['dn_type_vc'] == "CNAME") {
-                        $checkline .= $rowdns['dn_host_vc'] . " " . $rowdns['dn_ttl_in'] . " IN CNAME " . $rowdns['dn_target_vc'] . fs_filehandler::NewLine();
+                        $checkline .= $rowdns['dn_host_vc'] . " " . $rowdns['dn_ttl_in'] . " IN CNAME " . $rowdns['dn_target_vc'] . PHP_EOL;
                     }
                     if ($rowdns['dn_type_vc'] == "MX") {
-                        $checkline .= $rowdns['dn_host_vc'] . " " . $rowdns['dn_ttl_in'] . " IN MX " . $rowdns['dn_priority_in'] . " " . $rowdns['dn_target_vc'] . "." . fs_filehandler::NewLine();
+                        $checkline .= $rowdns['dn_host_vc'] . " " . $rowdns['dn_ttl_in'] . " IN MX " . $rowdns['dn_priority_in'] . " " . $rowdns['dn_target_vc'] . "." . PHP_EOL;
                     }
                     if ($rowdns['dn_type_vc'] == "TXT") {
-                        $checkline .= $rowdns['dn_host_vc'] . " " . $rowdns['dn_ttl_in'] . " IN TXT \"" . stripslashes($rowdns['dn_target_vc']) . "\"" . fs_filehandler::NewLine();
+                        $checkline .= $rowdns['dn_host_vc'] . " " . $rowdns['dn_ttl_in'] . " IN TXT \"" . stripslashes($rowdns['dn_target_vc']) . "\"" . PHP_EOL;
                     }
                     if ($rowdns['dn_type_vc'] == "SRV") {
-                        $checkline .= $rowdns['dn_host_vc'] . " " . $rowdns['dn_ttl_in'] . " IN SRV " . $rowdns['dn_priority_in'] . " " . $rowdns['dn_weight_in'] . " " . $rowdns['dn_port_in'] . " " . $rowdns['dn_target_vc'] . "." . fs_filehandler::NewLine();
+                        $checkline .= $rowdns['dn_host_vc'] . " " . $rowdns['dn_ttl_in'] . " IN SRV " . $rowdns['dn_priority_in'] . " " . $rowdns['dn_weight_in'] . " " . $rowdns['dn_port_in'] . " " . $rowdns['dn_target_vc'] . "." . PHP_EOL;
                     }
                     if ($rowdns['dn_type_vc'] == "SPF") {
-                        $checkline .= $rowdns['dn_host_vc'] . " " . $rowdns['dn_ttl_in'] . " IN SPF \"" . stripslashes($rowdns['dn_target_vc']) . "\"" . fs_filehandler::NewLine();
+                        $checkline .= $rowdns['dn_host_vc'] . " " . $rowdns['dn_ttl_in'] . " IN SPF \"" . stripslashes($rowdns['dn_target_vc']) . "\"" . PHP_EOL;
                     }
                     if ($rowdns['dn_type_vc'] == "NS") {
-                        $checkline .= $rowdns['dn_host_vc'] . " " . $rowdns['dn_ttl_in'] . " IN NS " . $rowdns['dn_target_vc'] . "." . fs_filehandler::NewLine();
+                        $checkline .= $rowdns['dn_host_vc'] . " " . $rowdns['dn_ttl_in'] . " IN NS " . $rowdns['dn_target_vc'] . "." . PHP_EOL;
                     }
                 }
                 fs_filehandler::UpdateFile($zonecheck_file, 0777, $checkline);

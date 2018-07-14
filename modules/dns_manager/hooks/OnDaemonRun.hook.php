@@ -1,22 +1,22 @@
 <?php
 
-echo fs_filehandler::NewLine() . "START DNS Manager Hook" . fs_filehandler::NewLine();
+echo PHP_EOL . "START DNS Manager Hook" . PHP_EOL;
 if (ui_module::CheckModuleEnabled('DNS Config')) {
-    echo "DNS Manager module ENABLED..." . fs_filehandler::NewLine();
+    echo "DNS Manager module ENABLED..." . PHP_EOL;
     if (!fs_director::CheckForEmptyValue(ctrl_options::GetSystemOption('dns_hasupdates'))) {
-        echo "DNS Records have changed... Writing new/updated records..." . fs_filehandler::NewLine();
+        echo "DNS Records have changed... Writing new/updated records..." . PHP_EOL;
         WriteDNSZoneRecordsHook();
         WriteDNSNamedHook();
         ResetDNSRecordsUpatedHook();
         PurgeOldZoneDNSRecordsHook();
         ReloadBindHook();
     } else {
-        echo "DNS Records have not changed...nothing to do." . fs_filehandler::NewLine();
+        echo "DNS Records have not changed...nothing to do." . PHP_EOL;
     }
 } else {
-    echo "DNS Manager module DISABLED...nothing to do." . fs_filehandler::NewLine();
+    echo "DNS Manager module DISABLED...nothing to do." . PHP_EOL;
 }
-echo "END DNS Manager Hook." . fs_filehandler::NewLine();
+echo "END DNS Manager Hook." . PHP_EOL;
 
 function WriteDNSZoneRecordsHook()
 {
@@ -63,13 +63,13 @@ function WriteDNSZoneRecordsHook()
             fs_director::SetFileSystemPermissions(ctrl_options::GetSystemOption('zone_dir'));
         }
         $zone_file = (ctrl_options::GetSystemOption('zone_dir')) . $DomainName . ".txt";
-        $line = "$" . "TTL 10800" . fs_filehandler::NewLine();
-        $line .= "@ IN SOA ns1." . $DomainName . ".    postmaster." . $DomainName . ". (" . fs_filehandler::NewLine();
-        $line .= "    " . $SoaSerial . "  ;serial" . fs_filehandler::NewLine();
-        $line .= "    " . ctrl_options::GetSystemOption('refresh_ttl') . "    ;refresh after 6 hours" . fs_filehandler::NewLine();
-        $line .= "    " . ctrl_options::GetSystemOption('retry_ttl') . "    ;retry after 1 hour" . fs_filehandler::NewLine();
-        $line .= "    " . ctrl_options::GetSystemOption('expire_ttl') . "   ;expire after 1 week" . fs_filehandler::NewLine();
-        $line .= "    " . ctrl_options::GetSystemOption('minimum_ttl') . " )    ;minimum TTL of 1 day" . fs_filehandler::NewLine();
+        $line = "$" . "TTL 10800" . PHP_EOL;
+        $line .= "@ IN SOA ns1." . $DomainName . ".    postmaster." . $DomainName . ". (" . PHP_EOL;
+        $line .= "    " . $SoaSerial . "  ;serial" . PHP_EOL;
+        $line .= "    " . ctrl_options::GetSystemOption('refresh_ttl') . "    ;refresh after 6 hours" . PHP_EOL;
+        $line .= "    " . ctrl_options::GetSystemOption('retry_ttl') . "    ;retry after 1 hour" . PHP_EOL;
+        $line .= "    " . ctrl_options::GetSystemOption('expire_ttl') . "   ;expire after 1 week" . PHP_EOL;
+        $line .= "    " . ctrl_options::GetSystemOption('minimum_ttl') . " )    ;minimum TTL of 1 day" . PHP_EOL;
 
         $sql = $zdbh->prepare('SELECT * FROM x_dns WHERE dn_vhost_fk=:dnsrecord AND dn_deleted_ts IS NULL ORDER BY dn_type_vc');
         $sql->bindParam(':dnsrecord', $domain_id);
@@ -77,33 +77,33 @@ function WriteDNSZoneRecordsHook()
         while ($rowdns = $sql->fetch()) {
             switch ($rowdns['dn_type_vc']) {
                 case "A" :
-                    $line .= $rowdns['dn_host_vc'] . "    " . $rowdns['dn_ttl_in'] . "    IN    A    " . $rowdns['dn_target_vc'] . fs_filehandler::NewLine();
+                    $line .= $rowdns['dn_host_vc'] . "    " . $rowdns['dn_ttl_in'] . "    IN    A    " . $rowdns['dn_target_vc'] . PHP_EOL;
                     break;
                 case "AAAA" :
-                    $line .= $rowdns['dn_host_vc'] . "    " . $rowdns['dn_ttl_in'] . "    IN    AAAA    " . $rowdns['dn_target_vc'] . fs_filehandler::NewLine();
+                    $line .= $rowdns['dn_host_vc'] . "    " . $rowdns['dn_ttl_in'] . "    IN    AAAA    " . $rowdns['dn_target_vc'] . PHP_EOL;
                     break;
                 case "CNAME" :
-                    $line .= $rowdns['dn_host_vc'] . "    " . $rowdns['dn_ttl_in'] . "    IN    CNAME   " . $rowdns['dn_target_vc'] . ($rowdns['dn_target_vc'] == '@' ? '' : '.') . fs_filehandler::NewLine();
+                    $line .= $rowdns['dn_host_vc'] . "    " . $rowdns['dn_ttl_in'] . "    IN    CNAME   " . $rowdns['dn_target_vc'] . ($rowdns['dn_target_vc'] == '@' ? '' : '.') . PHP_EOL;
                     break;
                 case "MX" :
-                    $line .= $rowdns['dn_host_vc'] . "    " . $rowdns['dn_ttl_in'] . "    IN    MX    " . $rowdns['dn_priority_in'] . "  " . $rowdns['dn_target_vc'] . "." . fs_filehandler::NewLine();
+                    $line .= $rowdns['dn_host_vc'] . "    " . $rowdns['dn_ttl_in'] . "    IN    MX    " . $rowdns['dn_priority_in'] . "  " . $rowdns['dn_target_vc'] . "." . PHP_EOL;
                     break;
                 case "TXT" :
-                    $line .= $rowdns['dn_host_vc'] . "    " . $rowdns['dn_ttl_in'] . "    IN    TXT    \"" . stripslashes($rowdns['dn_target_vc']) . "\"" . fs_filehandler::NewLine();
+                    $line .= $rowdns['dn_host_vc'] . "    " . $rowdns['dn_ttl_in'] . "    IN    TXT    \"" . stripslashes($rowdns['dn_target_vc']) . "\"" . PHP_EOL;
                     break;
                 case "SRV" :
-                    $line .= $rowdns['dn_host_vc'] . "    " . $rowdns['dn_ttl_in'] . "    IN    SRV    " . $rowdns['dn_priority_in'] . "  " . $rowdns['dn_weight_in'] . "  " . $rowdns['dn_port_in'] . "  " . $rowdns['dn_target_vc'] . "." . fs_filehandler::NewLine();
+                    $line .= $rowdns['dn_host_vc'] . "    " . $rowdns['dn_ttl_in'] . "    IN    SRV    " . $rowdns['dn_priority_in'] . "  " . $rowdns['dn_weight_in'] . "  " . $rowdns['dn_port_in'] . "  " . $rowdns['dn_target_vc'] . "." . PHP_EOL;
                     break;
                 case "SPF" :
-                    $line .= $rowdns['dn_host_vc'] . "    " . $rowdns['dn_ttl_in'] . "    IN    SPF    \"" . stripslashes($rowdns['dn_target_vc']) . "\"" . fs_filehandler::NewLine();
-                    $line .= $rowdns['dn_host_vc'] . "    " . $rowdns['dn_ttl_in'] . "    IN    TXT    \"" . stripslashes($rowdns['dn_target_vc']) . "\"" . fs_filehandler::NewLine();
+                    $line .= $rowdns['dn_host_vc'] . "    " . $rowdns['dn_ttl_in'] . "    IN    SPF    \"" . stripslashes($rowdns['dn_target_vc']) . "\"" . PHP_EOL;
+                    $line .= $rowdns['dn_host_vc'] . "    " . $rowdns['dn_ttl_in'] . "    IN    TXT    \"" . stripslashes($rowdns['dn_target_vc']) . "\"" . PHP_EOL;
                     break;
                 case "NS" :
-                    $line .= $rowdns['dn_host_vc'] . "    " . $rowdns['dn_ttl_in'] . "    IN    NS    " . $rowdns['dn_target_vc'] . "." . fs_filehandler::NewLine();
+                    $line .= $rowdns['dn_host_vc'] . "    " . $rowdns['dn_ttl_in'] . "    IN    NS    " . $rowdns['dn_target_vc'] . "." . PHP_EOL;
                     break;
             }
         }
-        echo 'Updating zone record: ' . $DomainName . fs_filehandler::NewLine();
+        echo 'Updating zone record: ' . $DomainName . PHP_EOL;
         fs_filehandler::UpdateFile($zone_file, 0777, $line);
     }
 }
@@ -129,11 +129,11 @@ function WriteDNSNamedHook()
         fs_director::SetFileSystemPermissions(ctrl_options::GetSystemOption('named_dir'));
     }
     $named_file = ctrl_options::GetSystemOption('named_dir') . ctrl_options::GetSystemOption('named_conf');
-    echo "Updating " . $named_file . fs_filehandler::NewLine();
+    echo "Updating " . $named_file . PHP_EOL;
     // Now we have all domain ID's, loop through them and find records for each zone file.
     $line = "";
     foreach ($domains as $domain) {
-        echo "CHECKING ZONE FILE: " . ctrl_options::GetSystemOption('zone_dir') . $domain . ".txt..." . fs_filehandler::NewLine();
+        echo "CHECKING ZONE FILE: " . ctrl_options::GetSystemOption('zone_dir') . $domain . ".txt..." . PHP_EOL;
 
 
         $command = ctrl_options::GetSystemOption('named_checkzone');
@@ -144,15 +144,15 @@ function WriteDNSNamedHook()
         $retval = ctrl_system::systemCommand($command, $args);
 
         if ($retval == 0) {
-            echo "Syntax check passed. Adding zone to " . ctrl_options::GetSystemOption('named_conf') . fs_filehandler::NewLine();
-            $line .= "zone \"" . $domain . "\" IN {" . fs_filehandler::NewLine();
-            $line .= "	type master;" . fs_filehandler::NewLine();
-            $line .= "	file \"" . ctrl_options::GetSystemOption('zone_dir') . $domain . ".txt\";" . fs_filehandler::NewLine();
-	    $line .= "  update-policy { grant rndc-key name _acme-challenge.$domain txt; };" . fs_filehandler::NewLine();
-            $line .= "	allow-transfer { " . ctrl_options::GetSystemOption('allow_xfer') . "; };" . fs_filehandler::NewLine();
-            $line .= "};" . fs_filehandler::NewLine();
+            echo "Syntax check passed. Adding zone to " . ctrl_options::GetSystemOption('named_conf') . PHP_EOL;
+            $line .= "zone \"" . $domain . "\" IN {" . PHP_EOL;
+            $line .= "	type master;" . PHP_EOL;
+            $line .= "	file \"" . ctrl_options::GetSystemOption('zone_dir') . $domain . ".txt\";" . PHP_EOL;
+	    $line .= "  update-policy { grant rndc-key name _acme-challenge.$domain txt; };" . PHP_EOL;
+            $line .= "	allow-transfer { " . ctrl_options::GetSystemOption('allow_xfer') . "; };" . PHP_EOL;
+            $line .= "};" . PHP_EOL;
         } else {
-            echo "Syntax ERROR. Skipping zone record." . fs_filehandler::NewLine();
+            echo "Syntax ERROR. Skipping zone record." . PHP_EOL;
         }
     }
     fs_filehandler::UpdateFile($named_file, 0777, $line);
@@ -183,7 +183,7 @@ function PurgeOldZoneDNSRecordsHook()
     foreach ($zonefiles as $zonefile) {
         if (!in_array(substr($zonefile, 0, -4), $domains) && $zonefile != "." && $zonefile != "..") {
             if (file_exists(ctrl_options::GetSystemOption('zone_dir') . $zonefile)) {
-                echo "Purging old zone record from disk: " . substr($zonefile, 0, -4) . fs_filehandler::NewLine();
+                echo "Purging old zone record from disk: " . substr($zonefile, 0, -4) . PHP_EOL;
                 unlink(ctrl_options::GetSystemOption('zone_dir') . $zonefile);
             }
         }
@@ -197,7 +197,7 @@ function ReloadBindHook()
     } else {
         $reload_bind = ctrl_options::GetSystemOption('zsudo') . " service " . ctrl_options::GetSystemOption('bind_service') . " reload";
     }
-    echo "Reloading BIND now..." . fs_filehandler::NewLine();
+    echo "Reloading BIND now..." . PHP_EOL;
     pclose(popen($reload_bind, 'r'));
 }
 ?>

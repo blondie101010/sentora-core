@@ -11,14 +11,14 @@ try {
     
 }
 
-echo fs_filehandler::NewLine() . "START Backup Config." . fs_filehandler::NewLine();
+echo PHP_EOL . "START Backup Config." . PHP_EOL;
 if (ui_module::CheckModuleEnabled('Backup Config')) {
-    echo "Backup Config module ENABLED..." . fs_filehandler::NewLine();
+    echo "Backup Config module ENABLED..." . PHP_EOL;
 
 // Schedule daily backups are enabled...
     if (strtolower(ctrl_options::GetSystemOption('schedule_bu')) == "true") {
         runtime_hook::Execute('OnBeforeScheduleBackup');
-        echo "Backup Scheduling enabled - Backing up all enabled client files now..." . fs_filehandler::NewLine();
+        echo "Backup Scheduling enabled - Backing up all enabled client files now..." . PHP_EOL;
         // Get all accounts
         $bsql = "SELECT * FROM x_accounts WHERE ac_enabled_in=1 AND ac_deleted_ts IS NULL";
         $numrows = $zdbh->query($bsql);
@@ -26,7 +26,7 @@ if (ui_module::CheckModuleEnabled('Backup Config')) {
             $bsql = $zdbh->prepare($bsql);
             $bsql->execute();
             while ($rowclients = $bsql->fetch()) {
-                echo "Backing up client folder: " . $rowclients['ac_user_vc'] . "/public_html..." . fs_filehandler::NewLine();
+                echo "Backing up client folder: " . $rowclients['ac_user_vc'] . "/public_html..." . PHP_EOL;
                 // User loop
                 $username = $rowclients['ac_user_vc'];
                 $userid = $rowclients['ac_id_pk'];
@@ -70,17 +70,17 @@ if (ui_module::CheckModuleEnabled('Backup Config')) {
                     copy(ctrl_options::GetSystemOption('temp_dir') . $backupname . ".zip", $backupdir . $backupname . ".zip");
                     unlink(ctrl_options::GetSystemOption('temp_dir') . $backupname . ".zip");
                     fs_director::SetFileSystemPermissions($backupdir . $backupname . ".zip", 0777);
-                    echo $backupdir . $backupname . ".zip" . fs_filehandler::NewLine();
+                    echo $backupdir . $backupname . ".zip" . PHP_EOL;
                 }
             }
         }
         runtime_hook::Execute('OnAfterScheduleBackup');
-        echo "Backup Schedule COMPLETE..." . fs_filehandler::NewLine();
+        echo "Backup Schedule COMPLETE..." . PHP_EOL;
     }
 
 // Purge backups are enabled....
     if (strtolower(ctrl_options::GetSystemOption('purge_bu')) == "true") {
-        echo fs_filehandler::NewLine() . "Backup Purging enabled - Purging backups older than " . ctrl_options::GetSystemOption('purge_date') . " days..." . fs_filehandler::NewLine();
+        echo PHP_EOL . "Backup Purging enabled - Purging backups older than " . ctrl_options::GetSystemOption('purge_date') . " days..." . PHP_EOL;
         runtime_hook::Execute('OnBeforePurgeBackup');
         clearstatcache();
         // Get all accounts
@@ -90,7 +90,7 @@ if (ui_module::CheckModuleEnabled('Backup Config')) {
             $purge_date = ctrl_options::GetSystemOption('purge_date');
             $bsql = $zdbh->prepare($bsql);
             $bsql->execute();
-            echo "[FILE][PURGE_DATE][FILE_DATE][ACTION]" . fs_filehandler::NewLine();
+            echo "[FILE][PURGE_DATE][FILE_DATE][ACTION]" . PHP_EOL;
             while ($rowclients = $bsql->fetch()) {
                 $username = $rowclients['ac_user_vc'];
                 $backupdir = ctrl_options::GetSystemOption('hosted_dir') . $username . "/backups/";
@@ -105,25 +105,25 @@ if (ui_module::CheckModuleEnabled('Backup Config')) {
                             echo "" . $file . " - " . $purge_date . " - " . $filetime . "";
                             if ($purge_date < $filetime) {
                                 //delete the file
-                                echo " - Deleting file..." . fs_filehandler::NewLine();
+                                echo " - Deleting file..." . PHP_EOL;
                                 unlink($backupdir . $file);
                             } else {
-                                echo " - Skipping file..." . fs_filehandler::NewLine();
+                                echo " - Skipping file..." . PHP_EOL;
                             }
                         }
                     }
                 }
             }
         }
-        echo "Backup Purging COMPLETE..." . fs_filehandler::NewLine();
+        echo "Backup Purging COMPLETE..." . PHP_EOL;
         runtime_hook::Execute('OnAfterPurgeBackup');
     }
 
 
     // Clean temp backups....
-    echo fs_filehandler::NewLine() . "Purging backups from temp folder..." . fs_filehandler::NewLine();
+    echo PHP_EOL . "Purging backups from temp folder..." . PHP_EOL;
     clearstatcache();
-    echo "[FILE][PURGE_DATE][FILE_DATE][ACTION]" . fs_filehandler::NewLine();
+    echo "[FILE][PURGE_DATE][FILE_DATE][ACTION]" . PHP_EOL;
     $temp_dir = ctrl_options::GetSystemOption('sentora_root') . "/modules/backupmgr/temp/";
     if ($handle = @opendir($temp_dir)) {
         while (false !== ($file = readdir($handle))) {
@@ -136,16 +136,16 @@ if (ui_module::CheckModuleEnabled('Backup Config')) {
                 echo "" . $file . " - " . $purge_date . " - " . $filetime . "";
                 if (1 <= $filetime) {
                     //delete the file
-                    echo " - Deleting file..." . fs_filehandler::NewLine();
+                    echo " - Deleting file..." . PHP_EOL;
                     unlink($temp_dir . $file);
                 } else {
-                    echo " - Skipping file..." . fs_filehandler::NewLine();
+                    echo " - Skipping file..." . PHP_EOL;
                 }
             }
         }
     }
 } else {
-    echo "Backup Config module DISABLED...nothing to do." . fs_filehandler::NewLine();
+    echo "Backup Config module DISABLED...nothing to do." . PHP_EOL;
 }
-echo "END Backup Config." . fs_filehandler::NewLine();
+echo "END Backup Config." . PHP_EOL;
 ?>

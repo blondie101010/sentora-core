@@ -6,7 +6,7 @@ global $zdbh;
  * Calculate the home directory size for each 'active' user account on the server.
  */
 $userssql = $zdbh->query("SELECT ac_id_pk, ac_user_vc FROM x_accounts WHERE ac_deleted_ts IS NULL");
-echo fs_filehandler::NewLine() . "START Calculating disk Usage for all client accounts.." . fs_filehandler::NewLine();
+echo PHP_EOL . "START Calculating disk Usage for all client accounts.." . PHP_EOL;
 while ($userdir = $userssql->fetch()) {
     $homedirectory = ctrl_options::GetSystemOption('hosted_dir') . $userdir['ac_user_vc'];
     if (fs_director::CheckFolderExists($homedirectory)) {
@@ -53,16 +53,16 @@ while ($userdir = $userssql->fetch()) {
     }
 
 
-    echo "Disk usage for user \"" . $userdir['ac_user_vc'] . "\" is: " . $size . " (" . fs_director::ShowHumanFileSize($size) . ")" . fs_filehandler::NewLine();
+    echo "Disk usage for user \"" . $userdir['ac_user_vc'] . "\" is: " . $size . " (" . fs_director::ShowHumanFileSize($size) . ")" . PHP_EOL;
 }
-echo "END Calculating disk usage" . fs_filehandler::NewLine();
+echo "END Calculating disk usage" . PHP_EOL;
 
 
 /*
  * Calculate the bandwidth used for each user.
  */
 $checksql = $zdbh->query("SELECT COUNT(*) AS total FROM x_vhosts WHERE vh_deleted_ts IS NULL")->fetch();
-echo fs_filehandler::NewLine() . "START Calculating bandwidth usage for all client accounts.." . fs_filehandler::NewLine();
+echo PHP_EOL . "START Calculating bandwidth usage for all client accounts.." . PHP_EOL;
 if ($checksql['total'] > 0) {
     $domainssql = $zdbh->query("SELECT vh_acc_fk, vh_name_vc FROM x_vhosts WHERE vh_deleted_ts IS NULL");
     while ($domain = $domainssql->fetch()) {
@@ -70,15 +70,15 @@ if ($checksql['total'] > 0) {
         $bandwidthlog = ctrl_options::GetSystemOption('log_dir') . 'domains/' . $domainowner['username'] . '/' . $domain['vh_name_vc'] . '-bandwidth.log';
         $snapshotfile = ctrl_options::GetSystemOption('log_dir') . 'domains/' . $domainowner['username'] . '/' . $domain['vh_name_vc'] . '-snapshot.bw';
         $bandwidth = 0;
-        echo "Processing domain \"" . $domain['vh_name_vc'] . "\"" . fs_filehandler::NewLine();
+        echo "Processing domain \"" . $domain['vh_name_vc'] . "\"" . PHP_EOL;
         if (fs_director::CheckFileExists($bandwidthlog)) {
             fs_filehandler::CopyFile($bandwidthlog, $snapshotfile);
             if (fs_director::CheckFileExists($snapshotfile)) {
                 fs_filehandler::ResetFile($bandwidthlog);
-                echo "Generating bandwidth.. " . fs_filehandler::NewLine();
+                echo "Generating bandwidth.. " . PHP_EOL;
                 $bandwidth = sys_bandwidth::CalculateFromApacheLog($snapshotfile);
                 unlink($snapshotfile);
-                echo "usage: " . $bandwidth . " (" . fs_director::ShowHumanFileSize($bandwidth) . ")" . fs_filehandler::NewLine();
+                echo "usage: " . $bandwidth . " (" . fs_director::ShowHumanFileSize($bandwidth) . ")" . PHP_EOL;
             }
         }
         if (!fs_director::CheckForEmptyValue($bandwidth)) {
@@ -89,7 +89,7 @@ if ($checksql['total'] > 0) {
             $numrows->bindParam(':vh_acc_fk', $domain['vh_acc_fk']);
             $numrows->execute();            
         } else {
-            echo "No bandwidth used, skipping!" . fs_filehandler::NewLine();
+            echo "No bandwidth used, skipping!" . PHP_EOL;
         }
         $numrows = $zdbh->prepare("SELECT * FROM x_bandwidth WHERE bd_month_in = :date AND bd_acc_fk = :vh_acc_fk");
         $date = date("Ym");
@@ -109,5 +109,5 @@ if ($checksql['total'] > 0) {
         }
     }
 }
-echo "END Calculating bandwidth usage" . fs_filehandler::NewLine();
+echo "END Calculating bandwidth usage" . PHP_EOL;
 ?>

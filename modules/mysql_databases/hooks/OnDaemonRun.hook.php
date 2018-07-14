@@ -1,9 +1,9 @@
 <?php
 
-echo fs_filehandler::NewLine() . "START MySQL Databases hook" . fs_filehandler::NewLine();
-echo "Calculating the total size of all MySQL databases...." . fs_filehandler::NewLine();
+echo PHP_EOL . "START MySQL Databases hook" . PHP_EOL;
+echo "Calculating the total size of all MySQL databases...." . PHP_EOL;
 CalculateAllDatabaseSize();
-echo "END MySQL Databases hook" . fs_filehandler::NewLine();
+echo "END MySQL Databases hook" . PHP_EOL;
 
 /*
  * Calculate the total size of all MySQL database.
