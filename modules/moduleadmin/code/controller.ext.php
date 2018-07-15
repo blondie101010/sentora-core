@@ -401,7 +401,7 @@ class module_controller extends ctrl_module
 				break;
 
 			case 'git':
-				if (empty($_POST["moduleurl"]) {
+				if (empty($_POST["moduleurl"])) {
 					self::$error_message = "The git module URL was not provided.";
 	    			return;
 				}
