@@ -364,6 +364,28 @@ class module_controller extends ctrl_module
         $retval = $retval['mo_type_en'];
         return $retval;
     }
+ 
+static function generateCallTrace()
+{
+    $e = new Exception();
+    $trace = explode("\n", $e->getTraceAsString());
+    // reverse array to make steps line up chronologically
+    $trace = array_reverse($trace);
+    array_shift($trace); // remove {main}
+    array_pop($trace); // remove call to this method
+    $length = count($trace);
+    $result = array();
+	$result[] = "<pre>";
+    
+    for ($i = 0; $i < $length; $i++)
+    {
+        $result[] = ($i + 1)  . ')' . substr($trace[$i], strpos($trace[$i], ' ')); // replace '#someNum' with '$i)', set the right ordering
+    }
+    
+	$result[] = "</pre>";
+
+    return "\t" . implode("\n\t", $result);
+}
 
     static function doInstallModule() {
         self::$error_message = "";
@@ -403,6 +425,8 @@ class module_controller extends ctrl_module
 			case 'git':
 				if (empty($_POST["moduleurl"])) {
 					self::$error_message = "The git module URL was not provided.";
+error_reporting(-1); ini_set('display_errors', 1);
+self::$error_message .= PHP_EOL. self::generateCallTrace() . PHP_EOL;
 	    			return;
 				}
 
@@ -418,7 +442,11 @@ class module_controller extends ctrl_module
 
 				// run git to retrieve the module
 				chdir(ctrl_options::GetSystemOption('sentora_root') . 'modules/');
-				exec("git clone " . escapeshellarg($url), $output = [], $ret);
+				$junk = [];
+				exec("git clone " . escapeshellarg($url), $junk, $ret);
+
+				// go back to main dir or there will be problems with the auto-loader
+				chdir(ctrl_options::GetSystemOption('sentora_root'));
 
 				if ($ret != 0) {
                    	self::$error_message = "Git clone $url failed.";
