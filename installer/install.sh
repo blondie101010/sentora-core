@@ -146,7 +146,7 @@ fi
 if [ -L "/etc/zpanel" ] && [ -d "/etc/zpanel"  ]; then
     pkginst="n"
     pkginstlist=""
-    for package in "$DB_PCKG" "dovecot-mysql" "$HTTP_PCKG" "$PHP_PCKG" "proftpd" "$BIND_PCKG" ; do
+    for package in "$DB_PCKG" "dovecot-mysql" "$HTTP_PCKG" "$PHP_PCKG" "$BIND_PCKG" ; do
         if (inst "$package"); then
             pkginst="y" # At least one package is installed
             pkginstlist="$package $pkginstlist"
@@ -266,8 +266,8 @@ if [[ "$PANEL_FQDN" == "" ]] ; then
         echo ""
 
         # Checks if the panel domain is a subdomain
-        sub=$(echo "$PANEL_FQDN" | sed -n 's|\(.*\)\..*\..*|\1|p')
-        if [[ "$sub" == "" ]]; then
+        PANEL_SUB=$(echo "$PANEL_FQDN" | sed -n 's|\(.*\)\..*\..*|\1|p')
+        if [[ "$PANEL_SUB" == "" ]]; then
             echo -e "\e[1;31mWARNING: $PANEL_FQDN is not a subdomain!\e[0m"
             confirm="true"
         fi
@@ -582,8 +582,6 @@ if [ ! -L "/etc/zpanel" ] && [ -d "/etc/zpanel" ]; then
     rm -rf $PANEL_PATH/panel/modules/domains
     rm -rf $PANEL_PATH/panel/modules/faqs
     rm -rf $PANEL_PATH/panel/modules/forwarders
-    rm -rf $PANEL_PATH/panel/modules/ftp_admin
-    rm -rf $PANEL_PATH/panel/modules/ftp_management
     rm -rf $PANEL_PATH/panel/modules/mail_admin
     rm -rf $PANEL_PATH/panel/modules/mailboxes
     rm -rf $PANEL_PATH/panel/modules/manage_clients
@@ -622,7 +620,6 @@ if [ ! -L "/etc/zpanel" ] && [ -d "/etc/zpanel" ]; then
     rm -f /var/spool/vacation/vacation.pl
     rm -f /var/sentora/sieve/globalfilter.sieve
     rm -f /etc/dovecot/dovecot.conf
-    rm -f /etc/proftpd.conf
 
     mysqlpassword=$(cat /etc/sentora/panel/cnf/db.php | grep "pass" | cut -d \' -f 2);
 
@@ -778,13 +775,13 @@ if [ $PANEL_UPGRADE == true ]; then
     
     mysqldump -u root -p"$mysqlpassword" zpanel_core | mysql -u root -p"$mysqlpassword" -D sentora_core
     mysqldump -u root -p"$mysqlpassword" zpanel_postfix | mysql -u root -p"$mysqlpassword" -D sentora_postfix
-    mysqldump -u root -p"$mysqlpassword" zpanel_proftpd | mysql -u root -p"$mysqlpassword" -D sentora_proftpd
     mysqldump -u root -p"$mysqlpassword" zpanel_roundcube | mysql -u root -p"$mysqlpassword" -D sentora_roundcube
 
     sed -i "s|zpanel_core|sentora_core|" $PANEL_PATH/panel/cnf/db.php
 
 else
     sed -i "s|YOUR_ROOT_MYSQL_PASSWORD|$mysqlpassword|" $PANEL_PATH/panel/cnf/db.php
+    sed -i "s|!PANEL_SUB!|$PANEL_SUB|" $PANEL_CONF/sentora-install/sql/sentora_core.sql
     mysql -u root -p"$mysqlpassword" < $PANEL_CONF/sentora-install/sql/sentora_core.sql
 fi
 # Register mysql/mariadb service for autostart
@@ -1094,60 +1091,6 @@ if [[ "$OS" = "CentOs" ]]; then
 fi
 
 
-#--- ProFTPd
-echo -e "\n-- Installing ProFTPD"
-if [[ "$OS" = "CentOs" ]]; then
-    $PACKAGE_INSTALLER proftpd proftpd-mysql 
-    FTP_CONF_PATH='/etc/proftpd.conf'
-    sed -i "s|nogroup|nobody|" $PANEL_CONF/proftpd/proftpd-mysql.conf
-elif [[ "$OS" = "Ubuntu" || "$OS" = "debian" ]]; then
-    $PACKAGE_INSTALLER proftpd-mod-mysql
-    FTP_CONF_PATH='/etc/proftpd/proftpd.conf'
-fi
-
-# Create and init proftpd database
-if [ $PANEL_UPGRADE == false ]; then
-    mysql -u root -p"$mysqlpassword" < $PANEL_CONF/sentora-install/sql/sentora_proftpd.sql
-fi
-# Create and configure mysql password for proftpd
-proftpdpassword=$(passwordgen);
-sed -i "s|!SQL_PASSWORD!|$proftpdpassword|" $PANEL_CONF/proftpd/proftpd-mysql.conf
-mysql -u root -p"$mysqlpassword" -e "GRANT ALL PRIVILEGES ON sentora_proftpd .* TO 'proftpd'@'localhost' identified by '$proftpdpassword';";
-
-# Assign httpd user and group to all users that will be created
-HTTP_UID=$(id -u "$HTTP_USER")
-HTTP_GID=$(sed -nr "s/^$HTTP_GROUP:x:([0-9]+):.*/\1/p" /etc/group)
-mysql -u root -p"$mysqlpassword" -e "ALTER TABLE sentora_proftpd.ftpuser ALTER COLUMN uid SET DEFAULT $HTTP_UID"
-mysql -u root -p"$mysqlpassword" -e "ALTER TABLE sentora_proftpd.ftpuser ALTER COLUMN gid SET DEFAULT $HTTP_GID"
-sed -i "s|!SQL_MIN_ID!|$HTTP_UID|" $PANEL_CONF/proftpd/proftpd-mysql.conf
-
-# Setup proftpd base file to call sentora config
-rm -f "$FTP_CONF_PATH"
-#touch "$FTP_CONF_PATH"
-#echo "include $PANEL_CONF/proftpd/proftpd-mysql.conf" >> "$FTP_CONF_PATH";
-ln -s "$PANEL_CONF/proftpd/proftpd-mysql.conf" "$FTP_CONF_PATH"
-
-# setup proftpd log dir
-mkdir -p $PANEL_DATA/logs/proftpd
-chmod -R 644 $PANEL_DATA/logs/proftpd
-
-# Correct bug from package in Ubutu14.04 which screw service proftpd restart
-# see https://bugs.launchpad.net/ubuntu/+source/proftpd-dfsg/+bug/1246245
-if [[ "$OS" = "Ubuntu" && "$VER" = "14.04" ]]; then
-   sed -i 's|\([ \t]*start-stop-daemon --stop --signal $SIGNAL \)\(--quiet --pidfile "$PIDFILE"\)$|\1--retry 1 \2|' /etc/init.d/proftpd
-fi
-
-# Register proftpd service for autostart and start it
-if [[ "$OS" = "CentOs" ]]; then
-    if [[ "$VER" == "7" ]]; then
-        systemctl enable proftpd.service
-        systemctl start proftpd.service
-    else
-        chkconfig proftpd on
-        /etc/init.d/proftpd start
-    fi
-fi
-
 #--- BIND
 echo -e "\n-- Installing and configuring Bind"
 if [[ "$OS" = "CentOs" ]]; then
@@ -1194,6 +1137,14 @@ ln -s /usr/sbin/named-compilezone /usr/bin/named-compilezone
 
 # Setup acl IP to forbid zone transfer
 sed -i "s|!SERVER_IP!|$PUBLIC_IP|" $PANEL_CONF/bind/named.conf
+
+# TODO: remove testjp
+# include localhost IP in the acl
+# make paid module to configure secondary DNS:
+#	- basically ask for the secondary DNS name and IP
+#	- configure it in /etc/hosts and in our own zone
+#	- provide a configuration script for the secondary DNS server
+
 
 # Build key and conf files
 rm -rf $BIND_FILES/named.conf $BIND_FILES/rndc.conf $BIND_FILES/rndc.key
@@ -1339,17 +1290,14 @@ $PACKAGE_INSTALLER logrotate
 
 #	Link the configfiles 
 ln -s $PANEL_CONF/logrotate/Sentora-apache /etc/logrotate.d/Sentora-apache
-ln -s $PANEL_CONF/logrotate/Sentora-proftpd /etc/logrotate.d/Sentora-proftpd
 ln -s $PANEL_CONF/logrotate/Sentora-dovecot /etc/logrotate.d/Sentora-dovecot
 
 #	Configure the postrotatesyntax for different OS
 if [[ "$OS" = "CentOs" && "$VER" == "6" ]]; then
 	sed -i 's|systemctl reload httpd > /dev/null|service httpd reload > /dev/null|' $PANEL_CONF/logrotate/Sentora-apache 
-	sed -i 's|systemctl reload proftpd > /dev/null|service proftpd reload > /dev/null|' $PANEL_CONF/logrotate/Sentora-proftpd
 
 elif [[ "$OS" = "Ubuntu" || "$OS" = "debian" ]]; then
 	sed -i 's|systemctl reload httpd > /dev/null|/etc/init.d/apache2 reload > /dev/null|' $PANEL_CONF/logrotate/Sentora-apache
-	sed -i 's|systemctl reload proftpd > /dev/null|/etc/init.d/proftpd force-reload > /dev/null|' $PANEL_CONF/logrotate/Sentora-proftpd
 
 fi
 
@@ -1372,7 +1320,6 @@ service postfix restart
 service dovecot restart
 service "$CRON_SERVICE" restart
 service "$BIND_SERVICE" restart
-service proftpd restart
 service atd restart
 
 #--- Store the passwords for user reference
@@ -1383,7 +1330,6 @@ service atd restart
     echo ""
     echo "MySQL Root Password      : $mysqlpassword"
     echo "MySQL Postfix Password   : $postfixpassword"
-    echo "MySQL ProFTPd Password   : $proftpdpassword"
     echo "MySQL Roundcube Password : $roundcubepassword"
 } >> /root/passwords.txt
 chmod 600 /root/passwords.txt
@@ -1401,7 +1347,6 @@ echo " Sentora Password  : $zadminpassword"
 echo ""
 echo " MySQL Root Password      : $mysqlpassword"
 echo " MySQL Postfix Password   : $postfixpassword"
-echo " MySQL ProFTPd Password   : $proftpdpassword"
 echo " MySQL Roundcube Password : $roundcubepassword"
 echo "   (theses passwords are saved in /root/passwords.txt)"
 echo "########################################################"

@@ -211,6 +211,7 @@ INSERT INTO `sentora_core`.`x_dns_create` (`dc_id_pk`, `dc_acc_fk`, `dc_type_vc`
 (9, 0, 'NS', '@', 172800, 'ns2.:DOMAIN:', NULL, NULL, NULL),
 (10, 0, 'SPF', '@', 2419200, 'v=spf1 a mx ip4::IP:  mx:mail.:DOMAIN: ?all', NULL, NULL, NULL),
 (11, 0, 'TXT', '@', 2419200, 'v=spf1 a mx ip4::IP:  mx:mail.:DOMAIN: ?all', NULL, NULL, NULL);
+(12, 0, 'A', '!PANEL_SUB!', 3600, ':IP:', NULL, NULL, NULL);
 
 /*Table structure for table `x_faqs` */
 
@@ -232,11 +233,10 @@ CREATE TABLE `x_faqs` (
 insert  into `x_faqs`(`fq_id_pk`,`fq_acc_fk`,`fq_question_tx`,`fq_answer_tx`,`fq_global_in`,`fq_created_ts`,`fq_deleted_ts`) values 
 (1,1,'How can I update my personal contact details?','From the control panel homepage please click on the &quot;My Account&quot; icon to enable you to update your personal details.',1,NULL,NULL),
 (2,1,'How do I change my password?','Your Sentora and MySQL password can be easily changed using the &quot;Change Password&quot; icon on the control panel.',1,NULL,NULL),
-(3,1,'I don&#39;t think one of the services(Apache, MySQL, FTP, etc) are running. Is there any easy way to check?','Sentora comes with a service monitoring system that checks to make sure all the services are up and running, Simply go to your Control Panel Home and select the module called &quot;Service Status&quot;. From there you will be able to see if any of the services are down or up.',1,NULL,NULL),
+(3,1,'I don&#39;t think one of the services(Apache, MySQL, etc) are running. Is there any easy way to check?','Sentora comes with a service monitoring system that checks to make sure all the services are up and running, Simply go to your Control Panel Home and select the module called &quot;Service Status&quot;. From there you will be able to see if any of the services are down or up.',1,NULL,NULL),
 (4,1,'How can I set my domain to work with my Sentora Account?','To setup up a domain with Sentora first thing you need to do is go &quot;Domains&quot; and add your to the list. Next you need to set the Name Server on your Domain Registrar to match that of your host. This information can be obtained by contacting your host.',1,NULL,NULL),
 (7,1,'How can I create a MySQL Database?','To create a MySQL database simply go to the section of the panel called &quot;Database Management&quot; and select the module called &quot;MySQL Databases&quot; from here you will easily be able to add and manage databases on your account.',1,NULL,NULL),
 (8,1,'What is phpMyAdmin?','phpMyAdmin is an open source tool intended to handle the administration of MySQL databases. It can perform various tasks such as creating, modifying or deleting databases, tables, fields or rows or executing SQL statements',1,NULL,NULL),
-(9,1,'How do I create FTP Accounts?','You can create FTP accounts by going to &quot;FTP Accounts&quot; from their you can add accounts and manage quotas and directories. ',1,NULL,NULL),
 (11,1,'How do I create an E-Mail Account?','Go to the Mail section of Sentora and select the module called &quot;Mailboxes&quot;, from here you can create E-Mail account for each domain setup on your account. You can also reset passwords to previously created accounts.',1,NULL,NULL),
 (12,1,'How do I create a Mail Alias?','Go to the Mail section of Sentora and select the module called &quot;Aliases&quot;, from here you can create Alias E-Mail accounts for each previously created E-Mail account. All mail sent to the alias will be delivered to the master e-mail account.',1,NULL,NULL),
 (13,1,'How can I create a Mailing List?','Mailing lists can be setup by going to the Mail section of Sentora and select the module called &quot;Distribution Lists&quot;, from here you can create Mailing lists by creating an E-mail Account. ',1,NULL,NULL),
@@ -412,7 +412,6 @@ insert  into `x_modules`(`mo_id_pk`,`mo_category_fk`,`mo_name_vc`,`mo_version_in
 (23,2,'phpSysInfo',100,'phpsysinfo','user','phpSysInfo is a web-based server hardware monitoring tool which enables you to see detailed hardware statistics of your server.',0,'true','',''),
 (24,4,'MySQL Database',100,'mysql_databases','user','MySQL&reg; databases are used by many PHP applications such as forums and ecommerce systems, below you can manage and create MySQL&reg; databases.',0,'true','',''),
 (25,1,'Usage Viewer',100,'usage_viewer','user','The account usage screen enables you to see exactly what you are currently using on your hosting package.',0,'true','',''),
-(26,8,'FTP Accounts',100,'ftp_management','user','Using this module you can create FTP accounts which will enable you and any other accounts you create to have the ability to upload and manage files on your hosting space.',0,'true','',''),
 (27,3,'FAQ\'s',100,'faqs','user','Please find a list of the most common questions from users, if you are unable to find a solution to your problem below please then contact your hosting provider. Simply click on the FAQ below to view the solution.',NULL,'true','',''),
 (28,0,'Apache Config',100,'apache_admin','modadmin','This module enables you to configure Apache Vhost settings for your hosting accounts.',0,'true','',''),
 (29,5,'DNS Manager',100,'dns_manager','user',NULL,0,'true','',''),
@@ -424,7 +423,6 @@ insert  into `x_modules`(`mo_id_pk`,`mo_category_fk`,`mo_name_vc`,`mo_version_in
 (35,6,'Aliases',100,'aliases','user','Using this module you have the ability to create alias mailboxes to existing accounts.',0,'true','',''),
 (36,0,'Mail Config',100,'mail_admin','modadmin','This module enables you to configure your mail options',NULL,'true','',''),
 (39,4,'MySQL Users',100,'mysql_users','user','MySQL&reg; Users allows you to add users and permissions to your MySQL&reg; databases.',NULL,'true','',''),
-(40,0,'FTP Config',100,'ftp_admin','modadmin','This module enables you to configure FTP settings for your hosting accounts.',NULL,'true','',''),
 (41,0,'Backup Config',100,'backup_admin','modadmin','This module enables you to configure Backup settings for your hosting accounts.',NULL,'true','',''),
 (42,7,'Client Notice Manager',100,'client_notices','user','Enables resellers to set global notices for their clients.',NULL,'true',NULL,NULL),
 (46,7,'Theme Manager',100,'theme_manager','user','Enables the reseller to set themes configurations for their clients.',0,'true','',NULL),
@@ -632,13 +630,8 @@ insert  into `x_settings`(`so_id_pk`,`so_name_vc`,`so_cleanname_vc`,`so_value_tx
 (42,'purge_bu','Purge Backups','true','true|false','Delete client backups after allotted time has elapsed to help save diskspace (true/false)','Backup Config','true'),
 (43,'purge_date','Purge Date','30',NULL,'Time in days backups are safe from being deleted. After days have elapsed, older backups will be deleted on Daemon Day Run','Backup Config','true'),
 (44,'disk_bu','Disk Backups','true','true|false','Allow users to create and save backups of their home directories to disk. (true/false)','Backup Config','true'),
-(45,'schedule_bu','Daily Backups','false','true|false','Make a daily backup of each clients data, including MySQL databases to their backup folder. Backups will still be created if Disk Backups are set to false. (true/false)','Backup Config','true'),
-(46,'ftp_db','FTP Database','sentora_proftpd',NULL,'The name of the ftp server database','FTP Config','true'),
-(47,'ftp_php','FTP PHP','proftpd.php',NULL,'Name of PHP to include when adding FTP data.','FTP Config','true'),
-(48,'ftp_service','FTP Service Name','proftpd',NULL,'The name of the FTP service','FTP Config','true'),
-(49,'ftp_service_root','FTP Service Root','/etc/init.d/',NULL,'The path to the service executable if applicable.','FTP Config','true');
+(45,'schedule_bu','Daily Backups','false','true|false','Make a daily backup of each clients data, including MySQL databases to their backup folder. Backups will still be created if Disk Backups are set to false. (true/false)','Backup Config','true');
 insert  into `x_settings`(`so_id_pk`,`so_name_vc`,`so_cleanname_vc`,`so_value_tx`,`so_defvalues_tx`,`so_desc_tx`,`so_module_vc`,`so_usereditable_en`) values 
-(50,'ftp_config_file','FTP Config File','',NULL,'The path to the configuration file if applicable.','FTP Config','true'),
 (51,'mailserver_db','Mailserver Database','sentora_postfix',NULL,'The name of the mail server database','Mail Config','true'),
 (52,'hmailserver_et','Hmail Encryption Type','2',NULL,'Type of encryption uses for hMailServer passwords','Mail Config','false'),
 (53,'max_mail_size','Max Mailbox Size','200',NULL,'Maximum size in megabytes allowed for mailboxes. Default = 200','Mail Config','true'),
@@ -785,7 +778,6 @@ insert  into `x_translations`(`tr_id_pk`,`tr_en_tx`,`tr_de_tx`) values
 (110,'The account manager enables you to view, update and create client accounts.','Die Account-Manager ermöglicht es Ihnen, anzuzeigen, zu aktualisieren und erstellen Kundenkonten.'),
 (111,'Welcome to the Package Manager, using this module enables you to create and manage existing reseller packages on your Sentora hosting account.','Willkommen auf der Paket-Manager, mit diesem Modul ermöglicht Ihnen die Erstellung und Verwaltung von bestehenden Reseller-Pakete auf Ihrem Sentora Hosting-Account.'),
 (112,'Gives you access to your files with drag-and-drop, multiple file uploading, text editing, zip support.','Ermöglicht den Zugriff auf Ihre Dateien mit Drag-and-drop, multiple Datei-Upload, Textbearbeitung, zip unterstützen.'),
-(113,'Secure FTP Applet is a JAVA based FTP client component that runs within your web browser. It is designed to let non-technical users exchange data securely with an FTP server.','Secure FTP Applet ist eine Java-basierte FTP-Client-Komponente, die in Ihrem Web-Browser läuft. Es wurde entwickelt, um nicht-technische Anwender den Datenaustausch secureiy lassen mit einem FTP-Server.'),
 (114,'Full name','Vollständiger Name'),
 (115,'Email Address','E-Mail Adresse'),
 (116,'Phone Number','Telefonnummer'),
