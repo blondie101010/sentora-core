@@ -62,7 +62,6 @@ class ctrl_users {
         $userdetail->addItemValue('domainquota', $dbvals['qt_domains_in']);
         $userdetail->addItemValue('subdomainquota', $dbvals['qt_subdomains_in']);
         $userdetail->addItemValue('parkeddomainquota', $dbvals['qt_parkeddomains_in']);
-        $userdetail->addItemValue('ftpaccountsquota', $dbvals['qt_ftpaccounts_in']);
         $userdetail->addItemValue('mysqlquota', $dbvals['qt_mysql_in']);
         $userdetail->addItemValue('mailboxquota', $dbvals['qt_mailboxes_in']);
         $userdetail->addItemValue('forwardersquota', $dbvals['qt_fowarders_in']);
@@ -117,13 +116,6 @@ class ctrl_users {
         }
         if ($resource == 'distlists') {
             $sql = $zdbh->prepare("SELECT COUNT(*) AS amount FROM x_distlists WHERE dl_acc_fk= :acc_key AND dl_deleted_ts IS NULL");
-            $sql->bindParam(':acc_key', $acc_key);
-            $sql->execute();
-            $retval = $sql->fetch();
-            $retval = $retval['amount'];
-        }
-        if ($resource == 'ftpaccounts') {
-            $sql = $zdbh->prepare("SELECT COUNT(*) AS amount FROM x_ftpaccounts WHERE ft_acc_fk= :acc_key AND ft_deleted_ts IS NULL");
             $sql->bindParam(':acc_key', $acc_key);
             $sql->execute();
             $retval = $sql->fetch();

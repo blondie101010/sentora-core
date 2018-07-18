@@ -1,5 +1,4 @@
 GRANT ALL PRIVILEGES ON sentora_postfix .* TO 'postfix'@'localhost';
-GRANT ALL PRIVILEGES ON sentora_proftpd .* TO 'proftpd'@'localhost';
 GRANT ALL PRIVILEGES ON sentora_roundcube .* TO 'roundcube'@'localhost';
 
 ALTER TABLE `zpanel_core`.`x_accounts` 
@@ -29,9 +28,6 @@ COLLATE=utf8_general_ci;
 
 ALTER TABLE `zpanel_core`.`x_forwarders` 
 COLLATE=utf8_general_ci;
-
-ALTER TABLE `zpanel_core`.`x_ftpaccounts` 
-  CHANGE COLUMN ft_user_vc ft_user_vc varchar(50) NULL;
 
 ALTER TABLE `zpanel_core`.`x_logs` 
   DROP PRIMARY KEY, 
@@ -105,5 +101,4 @@ CREATE TABLE `zpanel_core`.`x_htpasswd_user` (
 
 CREATE DATABASE sentora_core;
 CREATE DATABASE sentora_postfix;
-CREATE DATABASE sentora_proftpd;
 CREATE DATABASE sentora_roundcube;

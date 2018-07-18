@@ -98,7 +98,6 @@ class module_controller extends ctrl_module
                     'parkeddomains' => $rowpackages['qt_parkeddomains_in'],
                     'fowarders' => $rowpackages['qt_fowarders_in'],
                     'distlists' => $rowpackages['qt_distlists_in'],
-                    'ftpaccounts' => $rowpackages['qt_ftpaccounts_in'],
                     'mysql' => $rowpackages['qt_mysql_in'],
                     'diskquota' => ($rowpackages['qt_diskspace_bi'] / 1024000),
                     'bandquota' => ($rowpackages['qt_bandwidth_bi'] / 1024000),
@@ -198,7 +197,6 @@ class module_controller extends ctrl_module
 										qt_mailboxes_in,
 										qt_fowarders_in,
 										qt_distlists_in,
-										qt_ftpaccounts_in,
 										qt_mysql_in,
 										qt_diskspace_bi,
 										qt_bandwidth_bi) VALUES (
@@ -255,7 +253,6 @@ class module_controller extends ctrl_module
         $sql->execute();
         $sql = $zdbh->prepare("UPDATE x_quotas SET qt_domains_in = :Domains,
 								qt_parkeddomains_in = :ParkedDomains,
-								qt_ftpaccounts_in   = :FTPAccounts,
 								qt_subdomains_in    = :SubDomains,
 								qt_mailboxes_in     = :Mailboxes,
 								qt_fowarders_in     = :Fowarders,
@@ -570,17 +567,6 @@ class module_controller extends ctrl_module
         if ($controller->GetControllerRequest('URL', 'other')) {
             $current = self::ListCurrentPackage($controller->GetControllerRequest('URL', 'other'));
             return $current[0]['distlists'];
-        } else {
-            return "";
-        }
-    }
-
-    static function getEditCurrentFTP()
-    {
-        global $controller;
-        if ($controller->GetControllerRequest('URL', 'other')) {
-            $current = self::ListCurrentPackage($controller->GetControllerRequest('URL', 'other'));
-            return $current[0]['ftpaccounts'];
         } else {
             return "";
         }

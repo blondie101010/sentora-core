@@ -42,8 +42,6 @@ class module_controller extends ctrl_module
     static $parkeddomainsquota;
     static $mysql;
     static $mysqlquota;
-    static $ftpaccounts;
-    static $ftpaccountsquota;
     static $mailboxes;
     static $mailboxquota;
     static $forwarders;
@@ -143,9 +141,6 @@ class module_controller extends ctrl_module
         self::$mysqlquota = module_controller::empty_as_0($currentuser['mysqlquota']);
         self::$mysql = ctrl_users::GetQuotaUsages('mysql', $currentuser['userid']);
 
-        self::$ftpaccountsquota = module_controller::empty_as_0($currentuser['ftpaccountsquota']);
-        self::$ftpaccounts = ctrl_users::GetQuotaUsages('ftpaccounts', $currentuser['userid']);
-
         self::$mailboxquota = module_controller::empty_as_0($currentuser['mailboxquota']);
         self::$mailboxes = ctrl_users::GetQuotaUsages('mailboxes', $currentuser['userid']);
 
@@ -190,7 +185,6 @@ class module_controller extends ctrl_module
                 module_controller::build_row_usage('Domains', self::$domains, self::$domainsquota) .
                 module_controller::build_row_usage('Sub-domains', self::$subdomains, self::$subdomainsquota) .
                 module_controller::build_row_usage('Parked domains', self::$parkeddomains, self::$parkeddomainsquota) .
-                module_controller::build_row_usage('FTP accounts', self::$ftpaccounts, self::$ftpaccountsquota) .
                 module_controller::build_row_usage('MySQL&reg databases', self::$mysql, self::$mysqlquota) .
                 module_controller::build_row_usage('Mailboxes', self::$mailboxes, self::$mailboxquota) .
                 module_controller::build_row_usage('Mail forwarders', self::$forwarders, self::$forwardersquota) .
@@ -245,11 +239,6 @@ class module_controller extends ctrl_module
     static function DisplayMailboxUsagepChart()
     {
         return self::DisplayChart('Mailbox Usage', self::$mailboxes, self::$mailboxquota);
-    }
-
-    static function DisplayFTPUsagepChart()
-    {
-        return self::DisplayChart('FTP Usage', self::$ftpaccounts, self::$ftpaccountsquota);
     }
 
     static function DisplayForwardersUsagepChart()

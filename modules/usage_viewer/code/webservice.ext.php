@@ -44,11 +44,7 @@ class webservice extends ws_xmws {
         $sql = $zdbh->query("SELECT COUNT(*) AS total FROM x_cronjobs WHERE ct_deleted_ts IS NULL")->Fetch();
         $total_crons = $sql['total'];
 
-        // Total FTP accounts
-        $sql = $zdbh->query("SELECT COUNT(*) AS total FROM x_ftpaccounts WHERE ft_deleted_ts IS NULL")->Fetch();
-        $total_ftpaccounts = $sql['total'];
-
-        // Total FTP accounts
+        // Total MySql DBs
         $sql = $zdbh->query("SELECT COUNT(*) AS total FROM x_mysql_databases WHERE my_deleted_ts IS NULL")->Fetch();
         $total_mysql = $sql['total'];
 
@@ -68,7 +64,6 @@ class webservice extends ws_xmws {
                     'diskspaceused' => $total_disk,
                     'bandwidthused' => $total_band,
                     'cronjobs' => $total_crons,
-                    'ftpaccounts' => $total_ftpaccounts,
                     'mysqldatabases' => $total_mysql,
                     'hostingpackages' => $total_packages,
                     'vhosts' => $total_vhosts,

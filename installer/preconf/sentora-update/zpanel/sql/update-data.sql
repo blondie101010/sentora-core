@@ -20,7 +20,7 @@ INSERT INTO `zpanel_core`.`x_permissions` (`pe_id_pk`, `pe_group_fk`, `pe_module
 INSERT INTO `zpanel_core`.`x_permissions` (`pe_id_pk`, `pe_group_fk`, `pe_module_fk`) VALUES('93', '2', '48');
 INSERT INTO `zpanel_core`.`x_permissions` (`pe_id_pk`, `pe_group_fk`, `pe_module_fk`) VALUES('92', '1', '48');
 
-UPDATE `zpanel_core`.`x_quotas` SET `qt_domains_in` = '-1', `qt_subdomains_in` = '-1', `qt_parkeddomains_in` = '-1', `qt_mailboxes_in` = '-1', `qt_fowarders_in` = '-1', `qt_distlists_in` = '-1', `qt_ftpaccounts_in` = '-1', `qt_mysql_in` = '-1', `qt_diskspace_bi` = '0', `qt_bandwidth_bi` = '0' WHERE `qt_id_pk` = '1';
+UPDATE `zpanel_core`.`x_quotas` SET `qt_domains_in` = '-1', `qt_subdomains_in` = '-1', `qt_parkeddomains_in` = '-1', `qt_mailboxes_in` = '-1', `qt_fowarders_in` = '-1', `qt_distlists_in` = '-1', `qt_mysql_in` = '-1', `qt_diskspace_bi` = '0', `qt_bandwidth_bi` = '0' WHERE `qt_id_pk` = '1';
 
 /** Reloading the settings afresh for sentora as many have changed values or names */
 TRUNCATE `zpanel_core`.`x_settings`;
@@ -63,14 +63,9 @@ INSERT  INTO zpanel_core.`x_settings`(`so_id_pk`,`so_name_vc`,`so_cleanname_vc`,
 (42,'purge_bu','Purge Backups','true','true|false','Delete client backups after allotted time has elapsed to help save diskspace (true/false)','Backup Config','true'),
 (43,'purge_date','Purge Date','30',NULL,'Time in days backups are safe from being deleted. After days have elapsed, older backups will be deleted on Daemon Day Run','Backup Config','true'),
 (44,'disk_bu','Disk Backups','true','true|false','Allow users to create and save backups of their home directories to disk. (true/false)','Backup Config','true'),
-(45,'schedule_bu','Daily Backups','false','true|false','Make a daily backup of each clients data, including MySQL databases to their backup folder. Backups will still be created if Disk Backups are set to false. (true/false)','Backup Config','true'),
-(46,'ftp_db','FTP Database','sentora_proftpd',NULL,'The name of the ftp server database','FTP Config','true'),
-(47,'ftp_php','FTP PHP','proftpd.php',NULL,'Name of PHP to include when adding FTP data.','FTP Config','true'),
-(48,'ftp_service','FTP Service Name','proftpd',NULL,'The name of the FTP service','FTP Config','true'),
-(49,'ftp_service_root','FTP Service Root','/etc/init.d/',NULL,'The path to the service executable if applicable.','FTP Config','true');
+(45,'schedule_bu','Daily Backups','false','true|false','Make a daily backup of each clients data, including MySQL databases to their backup folder. Backups will still be created if Disk Backups are set to false. (true/false)','Backup Config','true');
 
 INSERT INTO zpanel_core.`x_settings`(`so_id_pk`,`so_name_vc`,`so_cleanname_vc`,`so_value_tx`,`so_defvalues_tx`,`so_desc_tx`,`so_module_vc`,`so_usereditable_en`) VALUES 
-(50,'ftp_config_file','FTP Config File','',NULL,'The path to the configuration file if applicable.','FTP Config','true'),
 (51,'mailserver_db','Mailserver Database','sentora_postfix',NULL,'The name of the mail server database','Mail Config','true'),
 (52,'hmailserver_et','Hmail Encryption Type','2',NULL,'Type of encryption uses for hMailServer passwords','Mail Config','false'),
 (53,'max_mail_size','Max Mailbox Size','200',NULL,'Maximum size in megabytes allowed for mailboxes. Default = 200','Mail Config','true'),
