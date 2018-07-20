@@ -22,8 +22,8 @@ readme_directory = /usr/share/doc/postfix-2.2.2/README_FILES
 
 # network settings
 inet_interfaces = all
-mydomain = !PANEL_FQDN!
-myhostname = !PANEL_FQDN!
+mydomain = !PANEL_DOMAIN!
+myhostname = mail.!PANEL_DOMAIN!
 mynetworks = 127.0.0.1, !SERVER_IP!
 mydestination = localhost.$mydomain, localhost
 relay_domains = proxy:mysql:/etc/sentora/configs/postfix/mysql-relay_domains_maps.cf
@@ -65,18 +65,18 @@ smtpd_sasl_type = dovecot
 smtpd_sasl_path = private/auth
 
 # tls config
-smtp_use_tls = no
-smtpd_use_tls = no
+smtp_use_tls = yes
+smtpd_use_tls = yes
+smtpd_tls_security_level = may
 #smtp_tls_note_starttls_offer = yes
-#smtpd_tls_loglevel = 1
-#smtpd_tls_received_header = yes
-#smtpd_tls_session_cache_timeout = 3600s
-#tls_random_source = dev:/dev/urandom
-#smtp_tls_session_cache_database = btree:$data_directory/smtp_tls_session_cache
-# Change mail.example.com.* to your host name
-#smtpd_tls_key_file = /etc/pki/tls/private/mail.example.com.key
-#smtpd_tls_cert_file = /etc/pki/tls/certs/mail.example.com.crt
-# smtpd_tls_CAfile = /etc/pki/tls/root.crt
+smtpd_tls_loglevel = 1
+smtpd_tls_received_header = yes
+smtpd_tls_session_cache_timeout = 3600s
+tls_random_source = dev:/dev/urandom
+smtp_tls_session_cache_database = btree:$data_directory/smtp_tls_session_cache
+smtpd_tls_key_file = /etc/pki/tls/private/localhost.key
+smtpd_tls_cert_file = /etc/pki/tls/certs/localhost.crt
+smtpd_tls_CAfile = /etc/pki/tls/certs/ca-bundle.crt
 
 # rules restrictions
 smtpd_client_restrictions =
@@ -100,3 +100,13 @@ smtpd_data_restrictions = reject_unauth_pipelining
 smtpd_banner = $myhostname ESMTP
 
 message_size_limit = 20480000
+
+smtp_destination_concurrency_limit = 3
+smtp_destination_rate_delay = 3s
+smtp_extra_recipient_limit = 20
+
+#smtpd_milters           = inet:127.0.0.1:8891
+#non_smtpd_milters       = $smtpd_milters
+milter_default_action   = accept
+milter_protocol         = 2
+
